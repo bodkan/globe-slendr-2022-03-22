@@ -48,7 +48,7 @@ Finally, make sure you get a positive confirmation from the following check:
 
 Sometimes on Linux or Mac a header library of some kind is missing, which is important for some R package which is internally used by _slendr_. If that happens, `install.packages("slendr")` will fail with an error.
 
-If you use Mac and have [Homebrew](https://brew.sh) (I cannot recommend it enough! and not just for this), you can run [this command](https://www.slendr.net/articles/vignette-00-installation.html#macos).
+If you use Mac and have [Homebrew](https://brew.sh) (I cannot recommend it enough! and not just for this), you can run [this command](https://www.slendr.net/articles/vignette-00-installation.html#macos). If you're running something Ubuntu/Debian-like and have problems with the installation, [this](https://www.slendr.net/articles/vignette-00-installation.html#linux) might help.
 
 In case of persistent problems, please get in touch at `contact@bodkan.net`, pasting the error you got in an email. I'm happy to help you in person (I'm on vacation March 13-17 but there will be enough time to solve issues before the workshop).
 

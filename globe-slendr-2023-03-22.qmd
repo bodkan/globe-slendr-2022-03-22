@@ -562,15 +562,11 @@ ts <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8)
 then we can get samples stored in it via `ts_samples()`:
 
 ::: columns
-
 ::: {.column width="55%"}
-
 ```{r}
 #| output-location: fragment
 ts_samples(ts)
 ```
-
-
 :::
 
 ::: {.column width="2%"}
@@ -588,20 +584,16 @@ ts_samples(ts) %>% count(pop)
 ## Computing popgen statistics
 
 ::: columns
-
 ::: {.column width="50%"}
 ![](images/slendr_ts_functions.png)
 :::
 
 ::: {.column width="50%"}
-
 These functions work with:
 
-- vectors of names (single population) 
-- lists of vectors of names (multiple populations)
-
+-   vectors of names (single population)
+-   lists of vectors of names (multiple populations)
 :::
-
 :::
 
 . . .
@@ -612,11 +604,7 @@ ts_afs(ts, sample_sets = list(c("popA_1", "popA_2", "pop_3")))
 ts_f3(ts, A = "popA_1", B = "popB_1", C = "outgroup_1")
 ```
 
-
-
-
-
-# Exercise #2 &mdash; popgen statistics
+# Exercise #2 --- popgen statistics
 
 ## Exercise #2 --- popgen statistics
 
@@ -634,12 +622,6 @@ Compute [nucleotide diversity ($\pi$)](https://en.wikipedia.org/wiki/Nucleotide_
 <hr>
 
 Compute `ts_divergence()` (genetic divergence) or `ts_fst()` ([$F_{ST}$](https://en.wikipedia.org/wiki/Fixation_index)), or the "outgroup $f_3$" using CHIMP as the outgroup (`ts_f3()`), between pairs of populations. Do the results match the order of splits in your model?
-
-
-
-
-
-
 
 ## Exercise #2 --- popgen statistics
 
@@ -677,7 +659,6 @@ head(samples$pop3, 5)
 ```{r}
 head(samples$pop1, 5)
 ```
-
 :::
 :::
 :::
@@ -739,18 +720,6 @@ ts_f3(ts, A = list(afr = samples$AFR), B = list(nea = samples$NEA), C = "CHIMP_1
 ts_f3(ts, A = list(eur = samples$EUR), B = list(nea = samples$NEA), C = "CHIMP_1")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
 # Gene flow / admixture
 
 ## `gene_flow()` events
@@ -785,7 +754,6 @@ gf <- list(
 
 <center>**`gene_flow()` checks for consistency!**</center>
 
-
 ## Adding gene flow(s) to the model
 
 <br> <br>
@@ -805,55 +773,9 @@ model <- compile_model(
 
 ## Exercise #3 --- adding `gene_flow()`
 
-Add Neanderthal introgression into your model from Exercise #1 (let's say 3% pulse NEA -\> EUR at 55 kya).
+Add Neanderthal introgression into your model from Exercise #1 (let's say 5% pulse NEA -\> EUR at 55 kya).
 
 ![](images/intro_model2.png)
-
-## Exercise #3 --- adding `gene_flow()`
-
-Add Neanderthal introgression into your model from Exercise #1 (let's say 3% pulse NEA -\> EUR at 55 kya).
-
-```{r}
-#| echo: false
-#| fig-align: center
-chimp <- population("CHIMP", time = 7e6, N = 5000)
-afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
-eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
-nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
-
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 50000, end = 40000)
-
-model <- compile_model(
-  populations = list(chimp, nea, afr, eur),
-  gene_flow = gf,
-  generation_time = 30
-)
-
-cowplot::plot_grid(
-  plot_model(model) + ggtitle("Normal time scale"),
-  plot_model(model, log = TRUE, proportions = TRUE) + ggtitle("Logarithmic time scale")
-)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## $f_4$-statistic
 
@@ -1029,6 +951,3 @@ Hint: You can compute Neanderthal ancestry for a vector of individuals `X` as `t
 <hr>
 
 -   new R package for ABC modeling [*demografr*](http://github.com/bodkan/demografr)
-
-
-

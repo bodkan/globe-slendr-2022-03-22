@@ -142,15 +142,20 @@ library(ggplot2)
 library(magrittr)
 ```
 
+<br>
+
 ```{r}
 # load slendr itself
 library(slendr)
 
-# setup slendr's internal (you must run `setup_env()` first!)
+# setup slendr's internal machinery
+# (you must run `setup_env()` first!)
 init_env()
 ```
 
-<center><br>*(ignore the message about missing SLiM)*</center>
+::: aside
+You can safely ignore the message about missing SLiM.
+:::
 
 # 
 
@@ -398,7 +403,7 @@ We have a compiled `model`, how do we simulate data?
 ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8)
 ```
 
-<center>(`ts` is a so-called **tree sequence**)</center>
+`ts` is a so-called **tree sequence**.
 
 # The output of a *slendr* simulation is a **tree sequence**
 
@@ -563,10 +568,11 @@ then we can get samples stored in it via `ts_samples()`:
 
 ::: columns
 ::: {.column width="55%"}
+::: fragment
 ```{r}
-#| output-location: fragment
 ts_samples(ts)
 ```
+:::
 :::
 
 ::: {.column width="2%"}
@@ -574,10 +580,11 @@ ts_samples(ts)
 :::
 
 ::: {.column width="43%"}
+::: fragment
 ```{r}
-#| output-location: fragment
 ts_samples(ts) %>% count(pop)
 ```
+:::
 :::
 :::
 
@@ -707,18 +714,6 @@ div <- ts_divergence(ts, sample_sets = samples)
 arrange(div, desc(divergence))
 ```
 
-## Outgroup $f_3$-statistic
-
-```{r}
-# A = Africans, B = Europeans, C = outgroup
-ts_f3(ts, A = list(afr = samples$AFR), B = list(eur = samples$EUR), C = "CHIMP_1")
-
-# A = Africans, B = Neanderthals, C = outgroup
-ts_f3(ts, A = list(afr = samples$AFR), B = list(nea = samples$NEA), C = "CHIMP_1")
-
-# A = Europeans, B = Neanderthals, C = outgroup
-ts_f3(ts, A = list(eur = samples$EUR), B = list(nea = samples$NEA), C = "CHIMP_1")
-```
 
 # Gene flow / admixture
 
@@ -771,19 +766,41 @@ model <- compile_model(
 
 # Exercise #3
 
-## Exercise #3 --- adding `gene_flow()`
+## Exercise #3a --- adding `gene_flow()`
 
-Add Neanderthal introgression into your model from Exercise #1 (let's say 5% pulse NEA -\> EUR at 55 kya).
+Add introgression into your Exercise #1 model (5% pulse NEA -\> EUR over 55-50 kya) and simulate a tree sequence from it.
 
-![](images/intro_model2.png)
+![](images/intro_model2.png){fig-align="center" width="70%"}
+
+## Exercise #3b --- detect introgression
+
+Test for the evidence of Neanderthal introgression in Europeans using an $f_4$-statistic (ABBA/BABA test, $D$ statistic) implemented in a tree-sequence function `ts_f4()`.
+
+You can either perform the test on single individuals from each population but the signal will be clearer if you compute the $f_4$ on \~20 Africans and Europeans.
+
+::: aside
+
+*Hint*: $f_4$ (AFR, EUR; NEAND, CHIMP) is the quartet of samples or populations you can use for the test (null hypothesis states that the value of this statistic is consistent with zero).
+
+:::
+
+# Exercise #3 --- solution
+
+Solution is on GitHub at [this](https://github.com/bodkan/globe-slendr-2023-03-22/tree/main/solutions/ex1.R) link.
 
 ## $f_4$-statistic
+
+. . .
 
 `f4(AFR_1, X; NEA, CH)` is "almost zero" for `X = AFR`:
 
 ```{r}
 ts_f4(ts, W = "AFR_1", X = "AFR_2", Y = "NEA_1", Z = "CHIMP_1")
 ```
+
+<br>
+
+. . .
 
 `f4(AFR, X; NEA, CH)` is "signif. negative" for `X = EUR`:
 
@@ -795,11 +812,12 @@ ts_f4(ts, W = "AFR_1", X = "EUR_1", Y = "NEA_1", Z = "CHIMP_1")
 
 ```{r}
 #| echo: false
+#| code-fold: true
 afr_samples <- samples$AFR %>% sample(25)
 eur_samples <- samples$EUR %>% sample(25)
 
-f4_afr <- lapply(afr_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
-f4_eur <- lapply(eur_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
+f4_afr <- lapply(afr_samples, ts_f4, ts = ts, W = "AFR_1", Y = "NEA_1", Z = "CHIMP_1") %>% bind_rows()
+f4_eur <- lapply(eur_samples, ts_f4, ts = ts, W = "AFR_1", Y = "NEA_1", Z = "CHIMP_1") %>% bind_rows()
 
 f4_afr$pop <- "AFR"
 f4_eur$pop <- "EUR"
@@ -813,6 +831,9 @@ rbind(f4_afr, f4_eur) %>%
   geom_hline(yintercept = 0, linetype = 2)
 ```
 
+
+
+
 # Time-series data
 
 ## Sampling aDNA samples through time
@@ -823,7 +844,11 @@ Imagine we have `pop1`, `pop2`, ... compiled in a `model`.
 
 <br>
 
-To record *ancient* individuals in the tree sequence, we can use `schedule_sampling()` like this:
+. . .
+
+To record *ancient* individuals in the tree sequence, we can use the function `schedule_sampling()`:
+
+. . .
 
 ```{r}
 #| eval: false
@@ -852,7 +877,7 @@ We can bind multiple sampling schedules together, giving us finer control about 
 eur_samples <- schedule_sampling(model, times = c(40000, 30000, 20000, 10000, 0), list(eur, 1))
 afr_samples <- schedule_sampling(model, times = 0, list(afr, 1))
 
-samples <- bind_rows(eur_samples, afr_samples)
+samples <- rbind(eur_samples, afr_samples)
 ```
 
 ## How to use a sampling schedule?
@@ -860,8 +885,7 @@ samples <- bind_rows(eur_samples, afr_samples)
 To sample individuals based on a given schedule, we use the `samples =` argument of the `msprime()` functions:
 
 ```{r}
-ts <- msprime(model, samples = samples, sequence_length = 1e6, recombination_rate = 1e-8) %>% 
-  ts_mutate(mutation_rate = 1e-8)
+ts <- msprime(model, samples = samples, sequence_length = 1e6, recombination_rate = 1e-8)
 ```
 
 . . .
@@ -944,7 +968,7 @@ Hint: You can compute Neanderthal ancestry for a vector of individuals `X` as `t
 
 -   *slendr* paper on [bioRxiv](https://www.biorxiv.org/content/10.1101/2022.03.20.485041v3)
 
--   Documentation, tutorials can be found [here](https://www.slendr.net)
+-   Documentation tutorials can be found [here](https://www.slendr.net)
 
 -   GitHub repo (bug reports!) is [here](http://github.com/bodkan/slendr)
 

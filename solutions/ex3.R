@@ -35,14 +35,19 @@ ts_save(ts, file = "data/ex3.trees")
 ts <- ts_load("data/ex3.trees", model)
 ts
 
-# extract samples as a list of names --------------------------------------
+# solution to exercise #3 -------------------------------------------------
+
+library(dplyr)
+library(ggplot2)
+
+# extract samples as a list of names
 
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
-samples
 
-# admixture detection -----------------------------------------------------
+str(samples)
+samples$EUR %>% head(5)
 
-# D(AFR, EUR; NEA, CHIMP)
+# we can test for the presence of introgression with f4(AFR, EUR; NEA, CHIMP)
 
 ts_f4(ts, W = "AFR_1", X = "AFR_2", Y = "NEA_1", Z = "CHIMP_1")
 
@@ -57,10 +62,9 @@ f4_eur <- lapply(eur_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA
 f4_afr$pop <- "AFR"
 f4_eur$pop <- "EUR"
 
-library(ggplot2)
+f4 <- rbind(f4_afr, f4_eur)
 
-rbind(f4_afr, f4_eur) %>%
-  ggplot(aes(pop, f4, color = pop)) +
+ggplot(f4, aes(pop, f4, color = pop)) +
   geom_boxplot() +
   geom_jitter() +
   geom_hline(yintercept = 0, linetype = 2)

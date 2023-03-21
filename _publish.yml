@@ -1,0 +1,6 @@
+- source: globe-slendr-2023-03-22.qmd
+  quarto-pub:
+    - id: 6ee8d00e-2fce-4283-93d5-d1f847c1b016
+      url: 'https://quartopub.com/sites/martinp/2023-03-22-globe-slendr-crash-course'
+    - id: 03835684-50bc-4b5f-8cbc-4a980f725ff7
+      url: 'https://quartopub.com/sites/martinp/2023-03-22-globe-slendr-crash-course-onepage'

@@ -1,37 +1,66 @@
-library(dplyr)
-
 library(slendr)
 init_env()
 
+# chimpanzee outgroup
 chimp <- population("CHIMP", time = 7e6, N = 5000)
+
+# two populations of anatomically modern humans: Africans and Europeans
 afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
-nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
 
-# this is a thing we added to the base model without gene flow
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 50000, end = 40000)
+# Neanderthal population splitting at 600 ky ago from modern humans
+# (becomes extinct by 40 ky ago)
+nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
+gf <- gene_flow(from = nea, to = eur, rate = 0.05, start = 55000, end = 50000)
+
+# compile the entire model into a single object
 model <- compile_model(
   populations = list(chimp, nea, afr, eur),
-  gene_flow = gf,                            # <--- we need to compile this too
+  gene_flow = gf,
   generation_time = 30
 )
 
-ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>%
-  ts_mutate(1e-8)
-
-samples <- ts_samples(ts)
-
-samples <- ts_samples(ts) %>%
-  split(., .$pop) %>%
-  lapply(pull, "name")
-
-
-ts_diversity(ts, sample_sets = samples)
-
-?ts_diversity
-
 # verify visually
 plot_model(model)
-plot_model(model, sizes = FALSE, proportions = TRUE)
-plot_model(model, sizes = FALSE, log = TRUE, proportions = TRUE)
+plot_model(model, sizes = FALSE)
+plot_model(model, log = TRUE)
+
+# simulate 100Mb of sequence
+ts <-
+  msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>%
+  ts_mutate(mutation_rate = 1e-8)
+ts_save(ts, file = "data/ex3.trees")
+
+ts <- ts_load("data/ex3.trees", model)
+ts
+
+# extract samples as a list of names --------------------------------------
+
+samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
+samples
+
+# admixture detection -----------------------------------------------------
+
+# D(AFR, EUR; NEA, CHIMP)
+
+ts_f4(ts, W = "AFR_1", X = "AFR_2", Y = "NEA_1", Z = "CHIMP_1")
+
+ts_f4(ts, W = "AFR_1", X = "EUR_1", Y = "NEA_1", Z = "CHIMP_1")
+
+afr_samples <- samples$AFR %>% sample(25)
+eur_samples <- samples$EUR %>% sample(25)
+
+f4_afr <- lapply(afr_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
+f4_eur <- lapply(eur_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
+
+f4_afr$pop <- "AFR"
+f4_eur$pop <- "EUR"
+
+library(ggplot2)
+
+rbind(f4_afr, f4_eur) %>%
+  ggplot(aes(pop, f4, color = pop)) +
+  geom_boxplot() +
+  geom_jitter() +
+  geom_hline(yintercept = 0, linetype = 2)

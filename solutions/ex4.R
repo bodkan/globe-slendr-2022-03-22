@@ -1,4 +1,5 @@
 library(dplyr)
+library(ggplot2)
 
 library(slendr)
 init_env()
@@ -16,70 +17,40 @@ model <- compile_model(
   generation_time = 30
 )
 
-plot_model(model, sizes = FALSE, proportions = TRUE)
-plot_model(model, log = TRUE, proportions = TRUE)
+plot_model(model)
+
+nea_samples <- schedule_sampling(model, times = c(70000, 40000), list(nea, 1))
+present_samples <- schedule_sampling(model, times = 0, list(chimp, 1), list(afr, 5), list(eur, 10))
+emh_samples <- schedule_sampling(model, times = runif(n = 40, min = 10000, max = 40000), list(eur, 1))
 
 ts <-
-  msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>%
+  msprime(
+    model,
+    samples = rbind(nea_samples, present_samples, emh_samples),
+    sequence_length = 100e6,
+    recombination_rate = 1e-8
+  ) %>%
   ts_mutate(mutation_rate = 1e-8)
+#ts_save(ts, "data/ex5.trees")
+
+ts <- ts_load("data/ex5.trees", model)
 ts
 
 
-# extract samples as a list of names --------------------------------------
 
-samples <- ts_samples(ts) %>%
-  split(., .$pop) %>%
-  lapply(pull, "name")
-samples
+# extract table with names and times of sampled Europeans (ancient and present day)
+eur_inds <- ts_samples(ts) %>% filter(pop == "EUR")
+eur_inds
 
-# compute diversity -------------------------------------------------------
+# compute f4-ration statistic (this will take ~30s)
+nea_ancestry <- ts_f4ratio(ts, X = eur_inds$name, "NEA_1", "NEA_2", "AFR_1", "CHIMP_1")
+nea_ancestry
 
-pi <- ts_diversity(ts, sample_sets = samples)
+eur_inds$ancestry <- nea_ancestry$alpha
 
-arrange(pi, diversity)
-
-# compute divergence ------------------------------------------------------
-
-div <- ts_divergence(ts, sample_sets = samples)
-
-arrange(div, desc(divergence))
-
-
-# outgroup f3 -------------------------------------------------------------
-
-ts_f3(ts, A = "AFR_1", B = "EUR_1", C = "CHIMP_1")
-
-samples$AFR
-samples$EUR
-ts_f3(ts, A = samples$AFR, B = samples$EUR, C = "CHIMP_1")
-
-
-ts_f3(ts, A = list(afr = samples$AFR), B = list(eur = samples$EUR), C = "CHIMP_1")
-
-ts_f3(ts, A = list(afr = samples$AFR), B = list(nea = samples$NEA), C = "CHIMP_1")
-
-
-# admixture detection -----------------------------------------------------
-
-# D(AFR, EUR; NEA, CHIMP)
-
-ts_f4(ts, W = "AFR_1", X = "AFR_2", Y = "NEA_1", Z = "CHIMP_1")
-
-ts_f4(ts, W = "AFR_1", X = "EUR_1", Y = "NEA_1", Z = "CHIMP_1")
-
-afr_samples <- samples$AFR %>% sample(25)
-eur_samples <- samples$EUR %>% sample(25)
-
-f4_afr <- lapply(afr_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
-f4_eur <- lapply(eur_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
-
-f4_afr$pop <- "AFR"
-f4_eur$pop <- "EUR"
-
-library(ggplot2)
-
-rbind(f4_afr, f4_eur) %>%
-  ggplot(aes(pop, f4, color = pop)) +
-  geom_boxplot() +
-  geom_jitter() +
-  geom_hline(yintercept = 0, linetype = 2)
+eur_inds %>%
+  ggplot(aes(time, ancestry)) +
+    geom_point() +
+    geom_smooth(method = "lm", linetype = 2, color = "red", linewidth = 0.5) +
+    xlim(40000, 0) + coord_cartesian(ylim = c(0, 0.1)) +
+    labs(x = "time [years ago]", y = "Neanderthal ancestry proportion")

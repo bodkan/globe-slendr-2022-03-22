@@ -76,7 +76,7 @@ The most famous and widely used are [SLiM](https://messerlab.org/slim/) and [*ms
 
 Both are very powerful...
 
-... but they require a lot of programming knowledge\...
+... but require quite a bit of programming knowledge\...
 
 ... and a lot of code for non-trivial simulations (🐛🪲🐜).
 
@@ -85,7 +85,7 @@ Both are very powerful...
 ::: fragment
 <br>
 
-<center>**This is why we will focus on [*slendr*](http://www.slendr.net),**<br>a convenient R interface to both SLiM and *msprime*.</center>
+<center>**This is why we will focus on [*slendr*](http://www.slendr.net),**<br>a new R interface for popgen modeling.</center>
 :::
 
 ## 
@@ -128,9 +128,18 @@ Both are very powerful...
 
 -   Lot of code duplication across projects
 
+# Motto
+
+<div>
+
+<h2>Solve 80% of modeling for popgen with 20% effort</h2>
+
+</div>
+
 # Let's get started
 
 ## We will need *slendr* & *tidyverse*
+
 
 <br>
 
@@ -180,7 +189,7 @@ pop1 <- population("pop1", N = 1000, time = 1)
 
 <br>
 
-This creates a normal R object. Typing it gives a summary:
+This creates a normal R object. Typing it in R gives us:
 
 ```{r}
 pop1
@@ -219,14 +228,13 @@ pop1_step <- resize(pop1, N = 100, time = 500, how = "step")
 Exponential increase:
 
 ```{r}
-#| code-line-numbers: "1|2"
 pop2 <- population("pop2", N = 100, time = 50, parent = pop1)
 pop2_exp <- resize(pop2, N = 10000, time = 500, end = 2000, how = "exponential")
 ```
 
 ## Tidyverse-style [pipe](https://magrittr.tidyverse.org) `%>%` interface
 
-A more concise way to express the same thing as before.
+A more concise way to express the same thing.
 
 Step size decrease:
 
@@ -297,7 +305,7 @@ The model is also compiled to disk which gives a nice additional layer of reprod
 
 ## Model summary
 
-Typing the compiled model into R prints a brief summary:
+Again, typing the model into R prints a brief summary:
 
 ```{r}
 model
@@ -357,7 +365,7 @@ Solution is on GitHub at [this](https://github.com/bodkan/globe-slendr-2023-03-2
 
 ## Simulating data
 
-We have a compiled `model`, how do we simulate data?
+We have a compiled `model` R object, how do we simulate data?
 
 . . .
 
@@ -397,7 +405,7 @@ ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8)
 
 <br>
 
-<h3>Why not VCF, EIGENSTRAT, or a genotype table?</h3>
+<h3>Why not VCF, EIGENSTRAT, etc.?</h3>
 
 ## What we usually have
 
@@ -413,14 +421,16 @@ ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8)
 <center>**This is exactly what a tree sequence *is*.**</center>
 :::
 
-## This allows efficient, massive simulations
+## Mutations added on branches _after_!
 
-If we have a simulated `ts` object, we can do:
+If we have a simulated tree-sequence object `ts`, we can do:
 
 ```{r}
 #| eval: false
 ts_mutated <- ts_mutate(ts, mutation_rate = 1e-8)
 ```
+
+. . .
 
 <br>Or, with a shortcut:
 
@@ -432,9 +442,9 @@ ts <-
 
 <br>
 
-<center>We will be using `ts_mutate()` throughout.</center>
+<center>**We will be using `ts_mutate()` throughout.**</center>
 
-## Tree sequences are also very efficient
+## Tree sequences are very efficient
 
 <br>
 
@@ -442,22 +452,22 @@ Let's take this minimalistic model:
 
 ```{r}
 ts <-
-  population("pop", time = 1e6, N = 10000) %>%
+  population("pop", time = 10000, N = 10000) %>%
   compile_model(generation_time = 30, direction = "backward") %>%
-  msprime(sequence_length = 1e6, recombination_rate = 1e-8)
+  msprime(sequence_length = 100e6, recombination_rate = 1e-8)
 ```
-
-(simulates 2 $\times$ 10000 chromosomes of 100 Mb)
 
 . . .
 
 <br>
 
+**Simulates 2 $\times$ 10000 chromosomes 100 Mb each.**
+
 **Runs in less than 30 seconds on my laptop!**
 
-**Taking about 66 Mb of memory!**
+**Takes only about 66 Mb of memory!**
 
-## Let's take the `model` we defined earlier...
+## Let's take the `model` from earlier...
 
 ```{r}
 #| fig-align: center
@@ -471,8 +481,10 @@ plot_model(model)
 
 ```{r}
 ts <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8) %>%
-  ts_mutate(mutation_rate = 1e-8 )
+  ts_mutate(mutation_rate = 1e-8)
 ```
+
+This simulates 1 Mb of sequence, with given rates of recombination and mutation.
 
 <br>
 
@@ -524,7 +536,7 @@ This [R interface](https://www.slendr.net/reference/index.html#tree-sequence-loa
 
 ## We need to refer to "samples"
 
-Each individual in *slendr* has a symbolic name, an age, and a population assignment stored in the tree-sequence object.
+Each individual in *slendr* has a symbolic name and other metadata stored in the tree-sequence object.
 
 ```{r}
 #| fig-align: center
@@ -571,6 +583,9 @@ These functions work with:
 
 -   vectors of names (single population)
 -   lists of vectors of names (multiple populations)
+
+The first argument is _always_ a `ts` object.
+
 :::
 :::
 
@@ -578,8 +593,11 @@ These functions work with:
 
 ```{r}
 #| eval: false
-ts_afs(ts, sample_sets = list(c("popA_1", "popA_2", "pop_3")))
-ts_f3(ts, A = "popA_1", B = "popB_1", C = "outgroup_1")
+#| code-line-numbers: "1|2-3"
+ts_f3(ts, A = "popA_1", B = c("popB_1", "popB_2"), C = "outgroup_1")
+ts_diversity(ts, sample_sets = list(A = c("popA_1", "popA_2", "popA_3"),
+                                    B = c("popB_1", "popB_2", "popB_3"),
+                                    C = c("popB_1", "popB_2")))
 ```
 
 # Exercise #2 --- popgen statistics
@@ -598,7 +616,7 @@ init_env()
 chimp <- population("CHIMP", time = 7e6, N = 5000)
 afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
-nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
+nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
 model <- compile_model(
   populations = list(chimp, nea, afr, eur),
@@ -609,6 +627,7 @@ model <- compile_model(
 
 
 ```{r}
+#| echo: false
 #| fig-align: center
 plot_model(model)
 ```
@@ -624,7 +643,7 @@ afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.05, start = 50000, end = 40000)
+gf <- gene_flow(from = nea, to = eur, rate = 0.05, start = 55000, end = 50000)
 
 model <- compile_model(
   populations = list(chimp, nea, afr, eur),
@@ -639,13 +658,19 @@ ts <-
 
 ## Exercise #2 --- popgen statistics
 
-<br>
-
-Compute [nucleotide diversity ($\pi$)](https://en.wikipedia.org/wiki/Nucleotide_diversity) in each population (`ts_diversity()`). Do your results fit known $N_e$ values?
+Simulate a tree sequence using `msprime()` from your model (maybe 50Mb), add mutations with `ts_mutate()`.
 
 <hr>
 
-Compute `ts_divergence()` (genetic divergence) or `ts_fst()` ([$F_{ST}$](https://en.wikipedia.org/wiki/Fixation_index)) between pairs of populations. Do the results match the order of splits in your model?
+Compute [diversity ($\pi$)](https://en.wikipedia.org/wiki/Nucleotide_diversity) in each population (`ts_diversity(ts, ...)`). Do your results fit $N_e$ in your model?
+
+<hr>
+
+Compute `ts_divergence(ts, ...)` (genetic divergence) or `ts_fst(ts, ...)` ([$F_{ST}$](https://en.wikipedia.org/wiki/Fixation_index)) between pairs of populations. Do the results match the order of splits in your model?
+
+::: aside
+_Hint:_ See [manual page](https://www.slendr.net/reference/index.html#tree-sequence-statistics) of each tree-sequence statistic function for notes on how to use it.
+:::
 
 ## Exercise #2 --- popgen statistics
 
@@ -661,6 +686,7 @@ ts_samples(ts)
 ::: {.column width="60%"}
 ::: fragment
 ```{r}
+# get a list of lists of individual names
 samples <- ts_samples(ts) %>%
   split(., .$pop) %>%
   lapply(pull, "name")
@@ -682,6 +708,8 @@ head(samples$EUR, 5)
 :::
 
 # Exercise #2 --- solution
+
+Solution is on GitHub at [this](https://github.com/bodkan/globe-slendr-2023-03-22/tree/main/solutions/ex2.R) link.
 
 ## Diversity
 
@@ -787,7 +815,9 @@ Add introgression into your Exercise #1 model (5% pulse NEA -\> EUR over 55-50 k
 
 <br>
 
-Test for the evidence of Neanderthal introgression in Europeans using an $f_4$-statistic implemented in a tree-sequence function `ts_f4()` (ABBA/BABA test, Patterson's $D$ statistic) .
+Pretend that you don't know whether or not you simulated Neanderthal introgression in your model.
+
+Test for the evidence of Neanderthal ancestry in Europeans vs Africans using the $f_4$-statistic implemented `ts_f4()` (also known as ABBA/BABA test or $D$ statistic).
 
 You can either perform the test on single individuals from each population but the signal will be clearer if you compute the $f_4$ on \~20 Africans and Europeans.
 

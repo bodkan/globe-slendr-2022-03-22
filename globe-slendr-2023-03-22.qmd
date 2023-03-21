@@ -139,7 +139,6 @@ Both are very powerful...
 # load Martin's favourite data analysis packages
 library(dplyr)     
 library(ggplot2)
-library(magrittr)
 ```
 
 <br>
@@ -157,36 +156,17 @@ init_env()
 You can safely ignore the message about missing SLiM.
 :::
 
-# 
-
-::: {style="text-align: right"}
-<h1>*slendr* haiku</h1>
-:::
-
-<br>
-
-::: {style="text-align: right"}
-Build simple models,
-
-<br>
-
-simulate data from them.
-
-<br>
-
-Just one plain R script.
-:::
 
 ## Typical steps (outline of this tutorial)
 
 <br>
 
-1.  creating populations
-2.  scheduling population splits
-3.  programming $N_e$ size changes
-4.  encoding gene-flow events
-5.  simulation sequence of a given size
-6.  computing statistics from simulated outputs
+1.  create populations
+2.  schedule population splits
+3.  program $N_e$ size changes
+4.  specify gene-flow events
+5.  simulate sequence data
+6.  compute statistics
 
 ## Creating a `population()`
 
@@ -383,8 +363,8 @@ We have a compiled `model`, how do we simulate data?
 
 *slendr* has two built-in simulation engines:
 
--   SLiM engine implemented [in Eidos/SLiM](https://github.com/bodkan/slendr/blob/main/inst/scripts/script.slim)
--   *msprime* engine implemented [in Python/*msprime*](https://github.com/bodkan/slendr/blob/main/inst/scripts/script.py)
+-   SLiM engine written [in Eidos/SLiM](https://github.com/bodkan/slendr/blob/main/inst/scripts/script.slim) (`slim()`)
+-   *msprime* engine written [in Python](https://github.com/bodkan/slendr/blob/main/inst/scripts/script.py) (`msprime()`)
 
 . . .
 
@@ -394,9 +374,7 @@ We have a compiled `model`, how do we simulate data?
 
 </center>
 
-. . .
-
-<br> This is all that's needed:
+<br> This is all that's needed to simulate data from a `model`:
 
 ```{r}
 #| eval: false
@@ -492,7 +470,8 @@ plot_model(model)
 <br>
 
 ```{r}
-ts <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8)
+ts <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8) %>%
+  ts_mutate(mutation_rate = 1e-8 )
 ```
 
 <br>
@@ -520,7 +499,7 @@ ts_eigenstrat(ts, prefix = "path/to/eigenstrat/prefix")
 ```{r}
 #| echo: false
 ts_tmp <- ts
-ts <- ts_simplify(ts, simplify_to = c("pop1_1", "pop2_1")) %>% ts_mutate(mutation_rate = 1e-8)
+ts <- ts_simplify(ts, simplify_to = c("pop1_1", "pop2_1"))
 ```
 
 ```{r}
@@ -556,15 +535,7 @@ plot_model(model)
 
 ## Extracting sample information
 
-If we have a tree sequence `ts` such as this:
-
-```{r}
-ts <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8)
-```
-
-. . .
-
-then we can get samples stored in it via `ts_samples()`:
+If we have a tree sequence `ts`, then we can get samples stored in it via `ts_samples()`:
 
 ::: columns
 ::: {.column width="55%"}
@@ -614,64 +585,34 @@ ts_f3(ts, A = "popA_1", B = "popB_1", C = "outgroup_1")
 # Exercise #2 --- popgen statistics
 
 ## Exercise #2 --- popgen statistics
+![](images/intro_model1.png){fig-align="center" width="70%"}
+
+## Exercise #2 --- popgen statistics
+
+
+```{r}
+#| echo: false
+library(slendr)
+init_env()
+
+chimp <- population("CHIMP", time = 7e6, N = 5000)
+afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
+eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
+nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
+
+model <- compile_model(
+  populations = list(chimp, nea, afr, eur),
+  generation_time = 30
+)
+
+```
+
 
 ```{r}
 #| fig-align: center
 plot_model(model)
 ```
 
-## Exercise #2 --- popgen statistics
-
-<br>
-
-Compute [nucleotide diversity ($\pi$)](https://en.wikipedia.org/wiki/Nucleotide_diversity) in each population (`ts_diversity()`). Do your results fit known $N_e$ values?
-
-<hr>
-
-Compute `ts_divergence()` (genetic divergence) or `ts_fst()` ([$F_{ST}$](https://en.wikipedia.org/wiki/Fixation_index)), or the "outgroup $f_3$" using CHIMP as the outgroup (`ts_f3()`), between pairs of populations. Do the results match the order of splits in your model?
-
-## Exercise #2 --- popgen statistics
-
-A useful R trick for handling using names of recorded individuals in `ts_*()` functions:
-
-```{r}
-#| echo: false
-ts <- msprime(model, sequence_length = 100, recombination_rate = 0)
-```
-
-::: columns
-::: {.column width="40%"}
-```{r}
-ts_samples(ts)
-```
-:::
-
-::: {.column width="60%"}
-::: fragment
-```{r}
-samples <- ts_samples(ts) %>%
-  split(., .$pop) %>%
-  lapply(pull, "name")
-```
-
-<br>
-
-::: fragment
-```{r}
-head(samples$pop3, 5)
-```
-:::
-
-::: fragment
-```{r}
-head(samples$pop1, 5)
-```
-:::
-:::
-:::
-:::
-
-# Exercise #2 --- solution
 
 ```{r}
 #| echo: false
@@ -696,6 +637,52 @@ ts <-
   ts_mutate(mutation_rate = 1e-8)
 ```
 
+## Exercise #2 --- popgen statistics
+
+<br>
+
+Compute [nucleotide diversity ($\pi$)](https://en.wikipedia.org/wiki/Nucleotide_diversity) in each population (`ts_diversity()`). Do your results fit known $N_e$ values?
+
+<hr>
+
+Compute `ts_divergence()` (genetic divergence) or `ts_fst()` ([$F_{ST}$](https://en.wikipedia.org/wiki/Fixation_index)) between pairs of populations. Do the results match the order of splits in your model?
+
+## Exercise #2 --- popgen statistics
+
+An R trick for using names of samples in `ts_*()` functions:
+
+::: columns
+::: {.column width="40%"}
+```{r}
+ts_samples(ts)
+```
+:::
+
+::: {.column width="60%"}
+::: fragment
+```{r}
+samples <- ts_samples(ts) %>%
+  split(., .$pop) %>%
+  lapply(pull, "name")
+```
+
+::: fragment
+```{r}
+str(samples)
+```
+:::
+
+::: fragment
+```{r}
+head(samples$EUR, 5)
+```
+:::
+:::
+:::
+:::
+
+# Exercise #2 --- solution
+
 ## Diversity
 
 ```{r}
@@ -715,6 +702,15 @@ arrange(div, desc(divergence))
 ```
 
 
+## $F_{ST}$
+
+```{r}
+fst <- ts_fst(ts, sample_sets = samples)
+
+arrange(fst, desc(Fst))
+```
+
+
 # Gene flow / admixture
 
 ## `gene_flow()` events
@@ -723,7 +719,7 @@ Gene flow is programmed the `gene_flow()` function.
 
 <br>
 
-If we have populations `p1` and `p2`, we schedule gene flow with:
+If we have `p1` and `p2`, we schedule gene flow with:
 
 ```{r}
 #| eval: false
@@ -755,6 +751,12 @@ gf <- list(
 
 ```{r}
 #| eval: false
+#| code-line-numbers: "|6|10"
+library(slendr)
+init_env()
+
+<... your definitions of populations ...>
+  
 gf <- gene_flow(from = ..., to = ..., <start, end, rate>)
 
 model <- compile_model(
@@ -762,9 +764,18 @@ model <- compile_model(
   gene_flow = gf,           # <--- gene flow(s) specified
   generation_time = 30
 )
+
+ts <- <... simulating a tree sequence ....>
 ```
 
+
 # Exercise #3
+
+## Exercise #3a --- adding `gene_flow()`
+
+Add introgression into your Exercise #1 model (5% pulse NEA -\> EUR over 55-50 kya) and simulate a tree sequence from it.
+
+![](images/intro_model1.png){fig-align="center" width="70%"}
 
 ## Exercise #3a --- adding `gene_flow()`
 
@@ -774,7 +785,9 @@ Add introgression into your Exercise #1 model (5% pulse NEA -\> EUR over 55-50 k
 
 ## Exercise #3b --- detect introgression
 
-Test for the evidence of Neanderthal introgression in Europeans using an $f_4$-statistic (ABBA/BABA test, $D$ statistic) implemented in a tree-sequence function `ts_f4()`.
+<br>
+
+Test for the evidence of Neanderthal introgression in Europeans using an $f_4$-statistic implemented in a tree-sequence function `ts_f4()` (ABBA/BABA test, Patterson's $D$ statistic) .
 
 You can either perform the test on single individuals from each population but the signal will be clearer if you compute the $f_4$ on \~20 Africans and Europeans.
 
@@ -816,8 +829,8 @@ ts_f4(ts, W = "AFR_1", X = "EUR_1", Y = "NEA_1", Z = "CHIMP_1")
 afr_samples <- samples$AFR %>% sample(25)
 eur_samples <- samples$EUR %>% sample(25)
 
-f4_afr <- lapply(afr_samples, ts_f4, ts = ts, W = "AFR_1", Y = "NEA_1", Z = "CHIMP_1") %>% bind_rows()
-f4_eur <- lapply(eur_samples, ts_f4, ts = ts, W = "AFR_1", Y = "NEA_1", Z = "CHIMP_1") %>% bind_rows()
+f4_afr <- lapply(afr_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
+f4_eur <- lapply(eur_samples, function(x) ts_f4(ts, W = "AFR_1", X = x, Y = "NEA_1", Z = "CHIMP_1")) %>% bind_rows()
 
 f4_afr$pop <- "AFR"
 f4_eur$pop <- "EUR"
@@ -908,9 +921,18 @@ ts
 :::
 :::
 
-# Exercise #5
 
-## Exercise #5a --- ancient samples
+
+
+
+
+
+
+
+
+# Exercise #4
+
+## Exercise #4a --- ancient samples
 
 ```{r}
 #| echo: false
@@ -927,19 +949,19 @@ model <- compile_model(
   generation_time = 30
 )
 
-plot_model(model)
+plot_model(model, proportions = TRUE)
 ```
 
-## Exercise #5a --- ancient samples
+## Exercise #4a --- ancient samples
 
 Simulate data from your model using this sampling:
 
--   one present-day CHIMP and AFR individual
--   20 present-day EUR individuals
+-   one present-day CHIMP outgroup
+-   20 present-day EUR and AFR individuals
 -   1 NEA at 70 ky, 1 NEA at 40 ky
 -   1 EUR every 1000 years between 50-5 kya
 
-Reminder: you can do this by:
+_Hint_ you can do this by:
 
 ```{r}
 #| eval: false
@@ -950,7 +972,7 @@ ts <-
   ts_mutate(mutation_rate = 1e-8)
 ```
 
-## Exercise #5b --- $f_4$-ratio statistic
+## Exercise #4b --- $f_4$-ratio statistic
 
 Use $f_4$-ratio statistic to replicate the [following figure](https://www.pnas.org/doi/10.1073/pnas.1814338116#fig01):
 
@@ -960,7 +982,9 @@ Use $f_4$-ratio statistic to replicate the [following figure](https://www.pnas.o
 Hint: You can compute Neanderthal ancestry for a vector of individuals `X` as `ts_f4ratio(ts, X = X, "NEA_1", "NEA_2", "AFR_1", "CHIMP_1")`.
 :::
 
-# Exercise #5 --- solution
+# Exercise #4 --- solution
+
+Solution is on GitHub at [this](https://github.com/bodkan/globe-slendr-2023-03-22/tree/main/solutions/ex4.R) link.
 
 ## More information
 

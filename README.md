@@ -1,8 +1,8 @@
 # *slendr* simulation crash course at Globe (2023)
-<!--
-### You can find the slides [here](https://quartopub.com/sites/979368fd-4892-4010-8a6d-a3bf8563ac99).
 
-### [Here](https://quartopub.com/sites/99c8c3a2-8c9e-40ea-851f-c467e8759ba8) is a render of the slides as a single HTML page (easier for reference). -->
+### You can find the slides [here](https://martinp.quarto.pub/2023-03-22-globe-slendr-crash-course).
+
+### [Here](https://martinp.quarto.pub/2023-03-22-globe-slendr-crash-course-onepage) is a render of the slides as a single HTML page (easier for reference).
 
 This README describes how to set up your machine for the tutorial. After you're done installing _slendr_, make sure to run a small testing simulation ([here](#testing-the-setup)) to check that everything works as needed. **Only run that script after you have everything successfully installed!**
 

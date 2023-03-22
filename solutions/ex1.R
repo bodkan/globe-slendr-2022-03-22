@@ -5,7 +5,7 @@ init_env()
 chimp <- population("CHIMP", time = 7e6, N = 5000)
 
 # two populations of anatomically modern humans: Africans and Europeans
-afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
+afr <- population("AFR", parent = chimp, time = 6e6, N = 15000) # populations referred to must be slendr objects
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 
 # Neanderthal population splitting at 600 ky ago from modern humans

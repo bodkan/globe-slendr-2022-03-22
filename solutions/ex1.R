@@ -1,3 +1,5 @@
+# solution to exercise #1 -------------------------------------------------
+
 library(slendr)
 init_env()
 

@@ -19,16 +19,14 @@ plot_model(model)
 plot_model(model, sizes = FALSE)
 plot_model(model, log = TRUE)
 
-# simulate 100Mb of sequence
-t1 <- Sys.time()
 
+# solution to exercise #2 -- part 1 ---------------------------------------
+
+# simulate 100Mb of sequence
 ts <-
   msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>%
   ts_mutate(mutation_rate = 1e-8)
-
-t2 <- Sys.time()
-t2 - t1
-# Time difference of 2.799282 mins
+# 2.799282 mins
 
 ts_save(ts, file = "data/ex2.trees")
 
@@ -47,6 +45,8 @@ samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
 str(samples)
 samples$EUR %>% head(5)
 
+# solution to exercise #2 -- part 2 ---------------------------------------
+
 # compute diversity -------------------------------------------------------
 
 pi <- ts_diversity(ts, sample_sets = samples)
@@ -64,6 +64,8 @@ arrange(div, desc(divergence))
 fst <- ts_fst(ts, sample_sets = samples)
 
 arrange(fst, desc(Fst))
+
+
 
 #
 # bonus content!

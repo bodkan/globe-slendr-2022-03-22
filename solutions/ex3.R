@@ -35,8 +35,6 @@ ts_save(ts, file = "data/ex3.trees")
 ts <- ts_load("data/ex3.trees", model)
 ts
 
-# solution to exercise #3 -------------------------------------------------
-
 library(dplyr)
 library(ggplot2)
 
@@ -46,6 +44,8 @@ samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
 
 str(samples)
 samples$EUR %>% head(5)
+
+# solution to exercise #3 -------------------------------------------------
 
 # we can test for the presence of introgression with:
 #   f4(AFR, EUR; NEA, CHIMP)

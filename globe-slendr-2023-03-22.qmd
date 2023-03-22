@@ -132,7 +132,9 @@ Both are very powerful...
 
 <div>
 
-<h2>"Solve 80% of modeling in popgen with 20% effort."</h2>
+<br>
+
+<h3>"Solve 90% of demographic modeling in popgen with 10% effort."</h3>
 
 </div>
 

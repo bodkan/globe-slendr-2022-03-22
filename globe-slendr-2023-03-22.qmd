@@ -661,6 +661,13 @@ Solution is on GitHub at [this](https://github.com/bodkan/globe-slendr-2023-03-2
 
 # Gene flow / admixture
 
+## The model so far
+
+```{r}
+#| fig-align: center
+plot_model(model)
+```
+
 ## `gene_flow()` events
 
 Gene flow is programmed the `gene_flow()` function.

@@ -695,7 +695,7 @@ time direction: forward
 total running length: 3000 model time units
 model type: non-spatial
 
-configuration files in: /private/var/folders/d_/hblb15pd3b94rg0v35920wd80000gn/T/RtmpQBflr3/file1787333279c22 </code></pre>
+configuration files in: /private/var/folders/d_/hblb15pd3b94rg0v35920wd80000gn/T/RtmpaoIzAh/file17dad4a419387 </code></pre>
 </div>
 </div>
 </section>
@@ -874,20 +874,20 @@ Why not VCF, EIGENSTRAT, etc.?
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1,346 × 5
+<pre><code># A tibble: 1,265 × 5
      pos pop1_1_chr1 pop1_1_chr2 pop2_1_chr1 pop2_1_chr2
    &lt;int&gt;       &lt;int&gt;       &lt;int&gt;       &lt;int&gt;       &lt;int&gt;
- 1  4646           0           0           1           1
- 2 12284           0           0           1           1
- 3 23045           0           1           0           0
- 4 51874           1           1           1           1
- 5 57332           0           1           0           0
- 6 63885           1           1           1           1
- 7 66253           1           0           0           0
- 8 69759           1           1           1           1
- 9 72043           0           0           1           1
-10 78411           0           0           1           1
-# … with 1,336 more rows</code></pre>
+ 1   518           1           1           0           0
+ 2 11729           1           1           0           0
+ 3 22621           1           1           0           0
+ 4 30331           0           0           1           1
+ 5 31199           0           0           1           1
+ 6 62427           0           0           1           1
+ 7 65533           0           0           1           1
+ 8 70350           0           0           1           1
+ 9 75013           1           1           0           0
+10 86857           1           1           1           1
+# … with 1,255 more rows</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1070,22 +1070,29 @@ Why not VCF, EIGENSTRAT, etc.?
 <h1>Gene flow / admixture</h1>
 
 </section>
+<section id="the-model-so-far" class="slide level2">
+<h2>The model so far</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_model</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="globe-slendr-2023-03-22_files/figure-revealjs/unnamed-chunk-36-1.png" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="gene_flow-events" class="slide level2">
 <h2><code>gene_flow()</code> events</h2>
 <p>Gene flow is programmed the <code>gene_flow()</code> function.</p>
 <p><br></p>
 <p>If we have <code>p1</code> and <code>p2</code>, we schedule gene flow with:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>gf <span class="ot">&lt;-</span> <span class="fu">gene_flow</span>(<span class="at">from =</span> p1, <span class="at">to =</span> p2, <span class="at">start =</span> <span class="dv">500</span>, <span class="at">end =</span> <span class="dv">600</span>, <span class="at">rate =</span> <span class="fl">0.13</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>gf <span class="ot">&lt;-</span> <span class="fu">gene_flow</span>(<span class="at">from =</span> p1, <span class="at">to =</span> p2, <span class="at">start =</span> <span class="dv">500</span>, <span class="at">end =</span> <span class="dv">600</span>, <span class="at">rate =</span> <span class="fl">0.13</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <p>Multiple gene-flow events can be gathered in a list:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>gf <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gene_flow</span>(<span class="at">from =</span> p1, <span class="at">to =</span> p2, <span class="at">start =</span> <span class="dv">500</span>, <span class="at">end =</span> <span class="dv">600</span>, <span class="at">rate =</span> <span class="fl">0.13</span>),</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gene_flow</span>(<span class="at">from =</span> <span class="sc">&lt;</span>..<span class="sc">&gt;</span>, <span class="at">to =</span> <span class="sc">&lt;</span>..<span class="sc">&gt;</span>, <span class="at">start =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>, <span class="at">end =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>, <span class="at">rate =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>),</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&lt;</span> potentially many more ... <span class="sc">&gt;</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>gf <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gene_flow</span>(<span class="at">from =</span> p1, <span class="at">to =</span> p2, <span class="at">start =</span> <span class="dv">500</span>, <span class="at">end =</span> <span class="dv">600</span>, <span class="at">rate =</span> <span class="fl">0.13</span>),</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gene_flow</span>(<span class="at">from =</span> <span class="sc">&lt;</span>..<span class="sc">&gt;</span>, <span class="at">to =</span> <span class="sc">&lt;</span>..<span class="sc">&gt;</span>, <span class="at">start =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>, <span class="at">end =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>, <span class="at">rate =</span> <span class="sc">&lt;</span>...<span class="sc">&gt;</span>),</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&lt;</span> potentially many more ... <span class="sc">&gt;</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div class="fragment">
@@ -1099,20 +1106,20 @@ Why not VCF, EIGENSTRAT, etc.?
 <h2>Adding gene flow(s) to the model</h2>
 <p><br> <br></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41" data-code-line-numbers="|6|10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">library</span>(slendr)</span>
-<span id="cb41-2"><a href="#cb41-2"></a><span class="fu">init_env</span>()</span>
-<span id="cb41-3"><a href="#cb41-3"></a></span>
-<span id="cb41-4"><a href="#cb41-4"></a><span class="sc">&lt;</span>... your definitions of populations ...<span class="sc">&gt;</span></span>
-<span id="cb41-5"><a href="#cb41-5"></a>  </span>
-<span id="cb41-6"><a href="#cb41-6"></a>gf <span class="ot">&lt;-</span> <span class="fu">gene_flow</span>(<span class="at">from =</span> ..., <span class="at">to =</span> ..., <span class="sc">&lt;</span>start, end, rate<span class="sc">&gt;</span>)</span>
-<span id="cb41-7"><a href="#cb41-7"></a></span>
-<span id="cb41-8"><a href="#cb41-8"></a>model <span class="ot">&lt;-</span> <span class="fu">compile_model</span>(</span>
-<span id="cb41-9"><a href="#cb41-9"></a>  <span class="at">populations =</span> <span class="fu">list</span>(...),</span>
-<span id="cb41-10"><a href="#cb41-10"></a>  <span class="at">gene_flow =</span> gf,           <span class="co"># &lt;--- gene flow specified above</span></span>
-<span id="cb41-11"><a href="#cb41-11"></a>  <span class="at">generation_time =</span> <span class="dv">30</span></span>
-<span id="cb41-12"><a href="#cb41-12"></a>)</span>
-<span id="cb41-13"><a href="#cb41-13"></a></span>
-<span id="cb41-14"><a href="#cb41-14"></a>ts <span class="ot">&lt;-</span> <span class="er">&lt;</span>... simulating a tree sequence ....<span class="sc">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42" data-code-line-numbers="|6|10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="fu">library</span>(slendr)</span>
+<span id="cb42-2"><a href="#cb42-2"></a><span class="fu">init_env</span>()</span>
+<span id="cb42-3"><a href="#cb42-3"></a></span>
+<span id="cb42-4"><a href="#cb42-4"></a><span class="sc">&lt;</span>... your definitions of populations ...<span class="sc">&gt;</span></span>
+<span id="cb42-5"><a href="#cb42-5"></a>  </span>
+<span id="cb42-6"><a href="#cb42-6"></a>gf <span class="ot">&lt;-</span> <span class="fu">gene_flow</span>(<span class="at">from =</span> ..., <span class="at">to =</span> ..., <span class="sc">&lt;</span>start, end, rate<span class="sc">&gt;</span>)</span>
+<span id="cb42-7"><a href="#cb42-7"></a></span>
+<span id="cb42-8"><a href="#cb42-8"></a>model <span class="ot">&lt;-</span> <span class="fu">compile_model</span>(</span>
+<span id="cb42-9"><a href="#cb42-9"></a>  <span class="at">populations =</span> <span class="fu">list</span>(...),</span>
+<span id="cb42-10"><a href="#cb42-10"></a>  <span class="at">gene_flow =</span> gf,           <span class="co"># &lt;--- gene flow specified above</span></span>
+<span id="cb42-11"><a href="#cb42-11"></a>  <span class="at">generation_time =</span> <span class="dv">30</span></span>
+<span id="cb42-12"><a href="#cb42-12"></a>)</span>
+<span id="cb42-13"><a href="#cb42-13"></a></span>
+<span id="cb42-14"><a href="#cb42-14"></a>ts <span class="ot">&lt;-</span> <span class="er">&lt;</span>... simulating a tree sequence ....<span class="sc">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section>
 <section>
@@ -1160,13 +1167,13 @@ Why not VCF, EIGENSTRAT, etc.?
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schedule_sampling</span>(</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  model,                <span class="co"># compiled slendr model object</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">500</span>),  <span class="co"># at these times (can be also a single number) ...</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop1, <span class="dv">42</span>),       <span class="co"># ... sample 42 individuals from pop1</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop2, <span class="dv">10</span>),       <span class="co"># ... sample 10 individuals from pop2</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop3, <span class="dv">1</span>)         <span class="co"># ... sample 1 individual from pop 3</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schedule_sampling</span>(</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  model,                <span class="co"># compiled slendr model object</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">500</span>),  <span class="co"># at these times (can be also a single number) ...</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop1, <span class="dv">42</span>),       <span class="co"># ... sample 42 individuals from pop1</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop2, <span class="dv">10</span>),       <span class="co"># ... sample 10 individuals from pop2</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(pop3, <span class="dv">1</span>)         <span class="co"># ... sample 1 individual from pop 3</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -1174,7 +1181,7 @@ Why not VCF, EIGENSTRAT, etc.?
 <h2>Sampling schedule format</h2>
 <p>The output of <code>schedule_sampling()</code> is a plain data frame:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">40000</span>, <span class="dv">30000</span>, <span class="dv">20000</span>, <span class="dv">10000</span>), <span class="fu">list</span>(eur, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">40000</span>, <span class="dv">30000</span>, <span class="dv">20000</span>, <span class="dv">10000</span>), <span class="fu">list</span>(eur, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 7
    time pop       n y_orig x_orig y     x    
@@ -1188,10 +1195,10 @@ Why not VCF, EIGENSTRAT, etc.?
 <div class="fragment">
 <p>We can bind multiple sampling schedules together, giving us finer control about sampling:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>eur_samples <span class="ot">&lt;-</span> <span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">40000</span>, <span class="dv">30000</span>, <span class="dv">20000</span>, <span class="dv">10000</span>, <span class="dv">0</span>), <span class="fu">list</span>(eur, <span class="dv">1</span>))</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>afr_samples <span class="ot">&lt;-</span> <span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="dv">0</span>, <span class="fu">list</span>(afr, <span class="dv">1</span>))</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">rbind</span>(eur_samples, afr_samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>eur_samples <span class="ot">&lt;-</span> <span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">40000</span>, <span class="dv">30000</span>, <span class="dv">20000</span>, <span class="dv">10000</span>, <span class="dv">0</span>), <span class="fu">list</span>(eur, <span class="dv">1</span>))</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>afr_samples <span class="ot">&lt;-</span> <span class="fu">schedule_sampling</span>(model, <span class="at">times =</span> <span class="dv">0</span>, <span class="fu">list</span>(afr, <span class="dv">1</span>))</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">rbind</span>(eur_samples, afr_samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -1199,14 +1206,14 @@ Why not VCF, EIGENSTRAT, etc.?
 <h2>How to use a sampling schedule?</h2>
 <p>To sample individuals based on a given schedule, we use the <code>samples =</code> argument of the <code>msprime()</code> functions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">msprime</span>(model, <span class="at">samples =</span> samples, <span class="at">sequence_length =</span> <span class="fl">1e6</span>, <span class="at">recombination_rate =</span> <span class="fl">1e-8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">msprime</span>(model, <span class="at">samples =</span> samples, <span class="at">sequence_length =</span> <span class="fl">1e6</span>, <span class="at">recombination_rate =</span> <span class="fl">1e-8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <p>We can verify that only specific individuals are recorded:</p>
 <div class="columns">
 <div class="column" style="width:40%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ts_samples</span>(ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ts_samples</span>(ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 3
   name   time pop  
@@ -1222,12 +1229,12 @@ Why not VCF, EIGENSTRAT, etc.?
 </div><div class="column" style="width:60%;">
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>ts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>╔═══════════════════════════╗
 ║TreeSequence               ║
 ╠═══════════════╤═══════════╣
-║Trees          │       1370║
+║Trees          │       1146║
 ╟───────────────┼───────────╢
 ║Sequence Length│    1000000║
 ╟───────────────┼───────────╢
@@ -1235,12 +1242,12 @@ Why not VCF, EIGENSTRAT, etc.?
 ╟───────────────┼───────────╢
 ║Sample Nodes   │         12║
 ╟───────────────┼───────────╢
-║Total Size     │  197.0 KiB║
+║Total Size     │  163.5 KiB║
 ╚═══════════════╧═══════════╝
 ╔═══════════╤════╤═════════╤════════════╗
 ║Table      │Rows│Size     │Has Metadata║
 ╠═══════════╪════╪═════════╪════════════╣
-║Edges      │4297│134.3 KiB│          No║
+║Edges      │3517│109.9 KiB│          No║
 ╟───────────┼────┼─────────┼────────────╢
 ║Individuals│   6│192 Bytes│          No║
 ╟───────────┼────┼─────────┼────────────╢
@@ -1248,7 +1255,7 @@ Why not VCF, EIGENSTRAT, etc.?
 ╟───────────┼────┼─────────┼────────────╢
 ║Mutations  │   0│ 16 Bytes│          No║
 ╟───────────┼────┼─────────┼────────────╢
-║Nodes      │ 932│ 25.5 KiB│          No║
+║Nodes      │ 820│ 22.4 KiB│          No║
 ╟───────────┼────┼─────────┼────────────╢
 ║Populations│   4│341 Bytes│         Yes║
 ╟───────────┼────┼─────────┼────────────╢
@@ -1271,7 +1278,7 @@ Why not VCF, EIGENSTRAT, etc.?
 <section id="exercise-4a-ancient-samples" class="slide level2">
 <h2>Exercise #4a — ancient samples</h2>
 
-<img data-src="globe-slendr-2023-03-22_files/figure-revealjs/unnamed-chunk-45-1.png" width="960" class="r-stretch"></section>
+<img data-src="globe-slendr-2023-03-22_files/figure-revealjs/unnamed-chunk-46-1.png" width="960" class="r-stretch"></section>
 <section id="exercise-4a-ancient-samples-1" class="slide level2">
 <h2>Exercise #4a — ancient samples</h2>
 <p>Simulate data from your <code>model</code> using this sampling:</p>
@@ -1283,11 +1290,11 @@ Why not VCF, EIGENSTRAT, etc.?
 </ul>
 <p><em>Hint</em>: you can do this by:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="co"># rbind(...) together individual schedule_sampling() data frames</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span></span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">msprime</span>(model, <span class="at">samples =</span> samples, <span class="at">sequence_length =</span> <span class="fl">100e6</span>, <span class="at">recombination_rate =</span> <span class="fl">1e-8</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ts_mutate</span>(<span class="at">mutation_rate =</span> <span class="fl">1e-8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="co"># rbind(...) together individual schedule_sampling() data frames</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">msprime</span>(model, <span class="at">samples =</span> samples, <span class="at">sequence_length =</span> <span class="fl">100e6</span>, <span class="at">recombination_rate =</span> <span class="fl">1e-8</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ts_mutate</span>(<span class="at">mutation_rate =</span> <span class="fl">1e-8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-4b-f_4-ratio-statistic" class="slide level2">

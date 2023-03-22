@@ -5,17 +5,17 @@ author: "Martin Petr"
 date: "March 2023"
 date-format: "MMMM YYYY"
 format:
-  # revealjs:
-  #   eval: true
-  #   echo: true
-  #   code-line-numbers: false
-  #   fig-align: center
-  #   slide-number: true
-  html:
+  revealjs:
     eval: true
     echo: true
     code-line-numbers: false
     fig-align: center
+    slide-number: true
+  # html:
+  #   eval: true
+  #   echo: true
+  #   code-line-numbers: false
+  #   fig-align: center
 # execute:
 #   cache: true
 ---
@@ -458,7 +458,7 @@ ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>%
   ts_mutate(mutation_rate = 1e-8)
 ```
 
-This simulates 1 Mb of sequence, with given rates of recombination and mutation.
+This simulates 10 Mb of sequence, with given rates of recombination and mutation.
 
 <br>
 

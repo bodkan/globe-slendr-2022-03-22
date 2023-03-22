@@ -22,6 +22,7 @@ model <- compile_model(
 )
 
 # verify visually
+plot_model(model)
 plot_model(model, proportions = TRUE)
 plot_model(model, sizes = FALSE, proportions = TRUE)
 plot_model(model, log = TRUE, proportions = TRUE)

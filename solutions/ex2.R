@@ -9,7 +9,6 @@ afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 
 # Neanderthal population splitting at 600 ky ago from modern humans
-# (becomes extinct by 40 ky ago)
 nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
 # compile the entire model into a single object
@@ -44,6 +43,8 @@ ts
 library(dplyr)
 library(ggplot2)
 
+ts_samples(ts) 
+
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
 
 str(samples)
@@ -67,6 +68,10 @@ fst <- ts_fst(ts, sample_sets = samples)
 
 arrange(fst, desc(Fst))
 
+#
+# bonus content!
+#
+
 # f-stats -----------------------------------------------------------------
 
 ts_f3(ts, A = "AFR_1", B = "EUR_1", C = "CHIMP_1")
@@ -78,12 +83,14 @@ afs_nea <- ts_afs(ts, list(sample = c("NEA_1", "NEA_2", "NEA_3", "NEA_4", "NEA_5
 afs_eur <- ts_afs(ts, list(sample = c("EUR_1", "EUR_2", "EUR_3", "EUR_4", "EUR_5")), polarised = TRUE) %>% .[-c(1, length(.))]
 afs_chimp <- ts_afs(ts, list(sample = c("CHIMP_1", "CHIMP_2", "CHIMP_3", "CHIMP_4", "CHIMP_5")), polarised = TRUE) %>% .[-c(1, length(.))]
 
-ggplot() +
-  geom_line(aes(1:9, afs_afr, color = "AFR")) +
-  geom_line(aes(1:9, afs_nea, color = "NEA")) +
-  geom_line(aes(1:9, afs_eur, color = "EUR")) +
-  geom_line(aes(1:9, afs_chimp, color = "CHIMP")) +
-  scale_color_manual(values = c("green", "blue", "red", "pink")) +
-  labs(y = "frequency", x = "allele count")
+n <- length(afs_afr)
+
+afs <- data.frame(
+  frequency = c(afs_afr, afs_nea, afs_eur, afs_chimp),
+  bin = rep(1:nbins, 4),
+  pop = c(rep("AFR", nbins), rep("NEA", nbins), rep("EUR", nbins), rep("CHIMP", nbins))
+)
+
+ggplot(afs, aes(bin, frequency, color = pop)) + geom_line() + geom_point()
 
 plot_model(model, log = TRUE)

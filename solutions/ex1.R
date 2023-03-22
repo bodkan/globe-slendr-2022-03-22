@@ -9,7 +9,6 @@ afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 
 # Neanderthal population splitting at 600 ky ago from modern humans
-# (becomes extinct by 40 ky ago)
 nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
 # compile the entire model into a single object

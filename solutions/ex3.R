@@ -9,9 +9,9 @@ afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
 eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 
 # Neanderthal population splitting at 600 ky ago from modern humans
-# (becomes extinct by 40 ky ago)
 nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
+# this is new here --------------------------------------------------------
 gf <- gene_flow(from = nea, to = eur, rate = 0.05, start = 55000, end = 50000)
 
 # compile the entire model into a single object
@@ -22,9 +22,9 @@ model <- compile_model(
 )
 
 # verify visually
-plot_model(model)
-plot_model(model, sizes = FALSE)
-plot_model(model, log = TRUE)
+plot_model(model, proportions = TRUE)
+plot_model(model, sizes = FALSE, proportions = TRUE)
+plot_model(model, log = TRUE, proportions = TRUE)
 
 # simulate 100Mb of sequence
 ts <-

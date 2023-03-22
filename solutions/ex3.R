@@ -47,7 +47,13 @@ samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, "name")
 str(samples)
 samples$EUR %>% head(5)
 
-# we can test for the presence of introgression with f4(AFR, EUR; NEA, CHIMP)
+# we can test for the presence of introgression with:
+#   f4(AFR, EUR; NEA, CHIMP)
+#
+#      (A)  (B)  (B)  (A)
+#      (B)  (A)  (B)  (A)
+#
+# which compares the proportion of allele sharing patterns BABA vs ABBA
 
 ts_f4(ts, W = "AFR_1", X = "AFR_2", Y = "NEA_1", Z = "CHIMP_1")
 

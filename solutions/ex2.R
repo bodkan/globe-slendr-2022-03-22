@@ -12,10 +12,7 @@ eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
 nea <- population("NEA", parent = afr, time = 600e3, N = 1000)
 
 # compile the entire model into a single object
-model <- compile_model(
-  populations = list(chimp, nea, afr, eur),
-  generation_time = 30
-)
+model <- compile_model(populations = list(chimp, nea, afr, eur), generation_time = 30)
 
 # verify visually
 plot_model(model)
@@ -87,8 +84,8 @@ n <- length(afs_afr)
 
 afs <- data.frame(
   frequency = c(afs_afr, afs_nea, afs_eur, afs_chimp),
-  bin = rep(1:nbins, 4),
-  pop = c(rep("AFR", nbins), rep("NEA", nbins), rep("EUR", nbins), rep("CHIMP", nbins))
+  bin = rep(1:n, 4),
+  pop = c(rep("AFR", n), rep("NEA", n), rep("EUR", n), rep("CHIMP", n))
 )
 
 ggplot(afs, aes(bin, frequency, color = pop)) + geom_line() + geom_point()

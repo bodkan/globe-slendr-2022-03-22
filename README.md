@@ -100,3 +100,13 @@ RStudio sometimes interferes with Python setup needed for simulation. To fix thi
 <img src="images/rstudio_setting.png" width="70%">
 
 A friendly note: you should always do the above, even outside of this workshop. Keeping `.RData` files around breaks reproducibility of your work. Never use them!
+
+---
+
+This work is licensed under a
+[Creative Commons Attribution 4.0 International License][cc-by].
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
